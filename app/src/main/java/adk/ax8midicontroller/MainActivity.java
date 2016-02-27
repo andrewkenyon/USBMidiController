@@ -6,6 +6,7 @@ import android.media.midi.MidiDeviceInfo;
 import android.media.midi.MidiInputPort;
 import android.media.midi.MidiManager;
 import android.media.midi.MidiOutputPort;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -25,9 +26,11 @@ public class MainActivity extends AppCompatActivity {
 
         this.myDriver = MidiDriver.getInstance();
         this.myDriver.init(this);
-        this.myDriver.connect();
-
-        this.myConsole.setText(this.myDriver.getStatus());
+        this.myDriver.connect(new Handler(this.getMainLooper()), new Runnable() {
+            public void run() {
+                myConsole.setText(myDriver.getStatus());
+            }
+        });
     }
 
 }

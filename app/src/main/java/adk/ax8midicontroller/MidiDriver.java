@@ -4,6 +4,11 @@ import android.content.Context;
 import android.media.midi.MidiDevice;
 import android.media.midi.MidiDeviceInfo;
 import android.media.midi.MidiManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
+import javax.security.auth.callback.Callback;
 
 /**
  * Created by Andrew on 27/02/2016.
@@ -27,7 +32,7 @@ public class MidiDriver {
         this.myContext = context.getApplicationContext();
     }
 
-    public boolean connect() {
+    public void connect(final Handler handler, final Runnable runable) {
         this.myManager = ((MidiManager) this.myContext.getSystemService(Context.MIDI_SERVICE));
 
         this.myManager.registerDeviceCallback(new MidiManager.DeviceCallback() {
@@ -37,16 +42,15 @@ public class MidiDriver {
             public void onDeviceAdded(MidiDeviceInfo device) {
                 myManager.openDevice(info[0], new MidiManager.OnDeviceOpenedListener() {
                     public void onDeviceOpened(MidiDevice device) {
-                        isConnected = true;
+                        handler.post(runable);
                     }
-                }, null);
+                }, handler);
             }
 
             public void onDeviceRemoved(MidiDeviceInfo device) {
                 // ...
             }
-        }, null);
-        return isConnected;
+        }, handler);
     }
 
     public String getStatus() {
