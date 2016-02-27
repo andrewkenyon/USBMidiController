@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView myConsole;
+    MidiDriver myDriver;
 
-    MidiManager myManager;
+    TextView myConsole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,40 +23,11 @@ public class MainActivity extends AppCompatActivity {
 
         this.myConsole = ((TextView)this.findViewById(R.id.main_console));
 
-        this.myManager = ((MidiManager) getSystemService(Context.MIDI_SERVICE));
-        this.myManager.registerDeviceCallback(new MidiManager.DeviceCallback() {
-            public void onDeviceAdded(MidiDeviceInfo device) {
-                refreshDevices();
-            }
+        this.myDriver = MidiDriver.getInstance();
+        this.myDriver.init(this);
+        this.myDriver.connect();
 
-            public void onDeviceRemoved(MidiDeviceInfo device) {
-                refreshDevices();
-            }
-        }, null);
-
-        this.refreshDevices();
-    }
-
-    private void refreshDevices() {
-        MidiDeviceInfo[] info = this.myManager.getDevices();
-        this.myConsole.clearComposingText();
-
-        if(info.length > 0) {
-            for (int i = 0; i < info.length; i++) {
-                this.myConsole.append(
-                        "Device " + i + ": " +
-                                info[i].getInputPortCount() + " inputs, " +
-                                info[i].getOutputPortCount() + " outputs.\n"
-                );
-            }
-            this.myManager.openDevice(info[0], new MidiManager.OnDeviceOpenedListener() {
-                public void onDeviceOpened(MidiDevice device) {
-                    myConsole.append("Connected to device!");
-                }
-            }, null);
-        } else {
-            this.myConsole.setText("No info detected");
-        }
+        this.myConsole.setText(this.myDriver.getStatus());
     }
 
 }
