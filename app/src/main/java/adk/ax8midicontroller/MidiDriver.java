@@ -3,10 +3,14 @@ package adk.ax8midicontroller;
 import android.content.Context;
 import android.media.midi.MidiDevice;
 import android.media.midi.MidiDeviceInfo;
+import android.media.midi.MidiInputPort;
 import android.media.midi.MidiManager;
+import android.media.midi.MidiOutputPort;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import java.io.IOException;
 
 import javax.security.auth.callback.Callback;
 
@@ -20,6 +24,11 @@ public class MidiDriver {
 
     MidiManager myManager;
     Boolean isConnected = false;
+    MidiDevice myDevice;
+    MidiInputPort myOutput;
+    MidiOutputPort myInput;
+
+    Byte myChannel = 0;
 
     public static MidiDriver getInstance() {
         return ourInstance;
@@ -30,21 +39,23 @@ public class MidiDriver {
 
     public void init(Context context) {
         this.myContext = context.getApplicationContext();
+
+        this.myManager = ((MidiManager) this.myContext.getSystemService(Context.MIDI_SERVICE));
     }
 
-    public void connect(final Handler handler, final Runnable runable) {
-        this.myManager = ((MidiManager) this.myContext.getSystemService(Context.MIDI_SERVICE));
+    public void connect(final Runnable runnable) {
+        this.connect(runnable, new Handler());
+    }
+
+    public void connect(final Runnable runnable, final Handler handler) {
+        MidiDeviceInfo[] info = myManager.getDevices();
+        if(info.length > 0) {
+            connectToDevice(info[0], runnable, handler);
+        }
 
         this.myManager.registerDeviceCallback(new MidiManager.DeviceCallback() {
-
-            MidiDeviceInfo[] info = myManager.getDevices();
-
             public void onDeviceAdded(MidiDeviceInfo device) {
-                myManager.openDevice(info[0], new MidiManager.OnDeviceOpenedListener() {
-                    public void onDeviceOpened(MidiDevice device) {
-                        handler.post(runable);
-                    }
-                }, handler);
+                connectToDevice(device, runnable, handler);
             }
 
             public void onDeviceRemoved(MidiDeviceInfo device) {
@@ -53,7 +64,18 @@ public class MidiDriver {
         }, handler);
     }
 
-    public String getStatus() {
+    private void connectToDevice(MidiDeviceInfo device, final Runnable runnable, final Handler handler) {
+        myManager.openDevice(device, new MidiManager.OnDeviceOpenedListener() {
+            public void onDeviceOpened(MidiDevice device) {
+                myDevice = device;
+                myOutput = device.openInputPort(0);
+                myInput = device.openOutputPort(0);
+                handler.post(runnable);
+            }
+        }, handler);
+    }
+
+    public String getDeviceInfo() {
         MidiDeviceInfo[] info = this.myManager.getDevices();
 
         if(info.length > 0) {
@@ -67,6 +89,24 @@ public class MidiDriver {
             return buffer.toString();
         } else {
             return "No devices detected";
+        }
+    }
+
+    public boolean sendProgramChange(byte program) {
+        try {
+            this.myOutput.send(new byte[]{(byte) (0xC0 + this.myChannel), program}, 0, 2);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public boolean sendControlChange(byte control, byte value) {
+        try {
+            this.myOutput.send(new byte[]{(byte) (0xB0 + this.myChannel), control, value}, 0, 3);
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 }

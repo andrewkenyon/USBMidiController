@@ -26,9 +26,10 @@ public class MainActivity extends AppCompatActivity {
 
         this.myDriver = MidiDriver.getInstance();
         this.myDriver.init(this);
-        this.myDriver.connect(new Handler(this.getMainLooper()), new Runnable() {
+        this.myDriver.connect(new Runnable() {
             public void run() {
-                myConsole.setText(myDriver.getStatus());
+                myConsole.setText(myDriver.getDeviceInfo());
+                myConsole.append("Connected!");
             }
         });
     }
