@@ -30,6 +30,9 @@ public class MidiDriver {
 
     Byte myChannel = 0;
 
+    public static final CC_BANK_MSB = 0;
+    public static final CC_BANK_LSB = 32;
+
     public static MidiDriver getInstance() {
         return ourInstance;
     }
@@ -108,5 +111,9 @@ public class MidiDriver {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public boolean sendBankAndProgramChange(short preset) {
+        return sendControlChange(CC_BANK_MSB, preset / 128) && sendProgramChange(preset % 128);
     }
 }
