@@ -13,6 +13,8 @@ public class Ax8Controller {
 
     private static final byte headerChecksum = 0x8d;
 
+    private static final byte GET_PRESET_NUMBER = 0x14;
+
     public Ax8Controller() {
         this.myConnection = MidiConnection.getInstance();
     }
@@ -22,11 +24,23 @@ public class Ax8Controller {
             && this.myConnection.sendProgramChange(this.myChannel, preset % 128);
     }
 
-    private byte calculateChecksum(byte[] body) {
+    private byte appendChecksum(byte[] body) {
+        byte[] newBody = new byte[body.length + 1];
         byte checksum = headerChecksum;
         for (int i = 0; i < body.length; i++) {
+            newBody[i] = body[i];
             checksum = checksum ^ body[i];
         }
-        return (checksum & 0x7F);
+        newBody[body.length] = checksum & 0x7F;
+        return newBody;
+    }
+
+    public boolean getPresetNumber() {
+        byte[] body = {0x14};
+        return this.myConnection.sendSysExMessage(
+            MANUFACTURER_ID,
+            MODEL_ID,
+            this.appendChecksum(body)
+        );
     }
 }
