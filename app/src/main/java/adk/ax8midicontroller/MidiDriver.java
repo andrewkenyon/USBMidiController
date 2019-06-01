@@ -28,10 +28,13 @@ public class MidiDriver {
     MidiInputPort myOutput;
     MidiOutputPort myInput;
 
-    Byte myChannel = 0;
+    byte myChannel = 0;
 
     public static final CC_BANK_MSB = 0;
     public static final CC_BANK_LSB = 32;
+
+    byte[] myManufacturer;
+    byte myModel;
 
     public static MidiDriver getInstance() {
         return ourInstance;
@@ -44,6 +47,11 @@ public class MidiDriver {
         this.myContext = context.getApplicationContext();
 
         this.myManager = ((MidiManager) this.myContext.getSystemService(Context.MIDI_SERVICE));
+    }
+
+    public void configSysEx(byte[] manufacturer, byte model) {     
+        this.myManufacturer = manufacturer;
+        this.myModel = model;
     }
 
     public void connect(final Runnable runnable) {
@@ -113,11 +121,18 @@ public class MidiDriver {
         }
     }
 
-    public boolean sendSysEx(byte[] data) {
-        byte[] msg = new byte[data.length + 2]
+    public boolean sendSysExMessage(byte[] data) {
+        if (this.myManufacturer == null || this.myModel == null) {
+            return false;
+        }
+        byte[] msg = new byte[data.length + this.myManufacturer.length +3]
         msg[0] = 0xF0;
+        for (int i = 0; i < this.myManufacturer.length; i++) {
+            msg[i + 1] =  this.myManufacturer[i];
+        }
+        msg[this.myManufacturer.length + 1] = this.myModel;
         for (int i = 0; i < data.length; i++) {
-            msg[i + 1] = data[i];
+            msg[i + this.myManufacturer.length + 2] = data[i];
         }
         msg[msg.length - 1] = 0xF7;
         try {
