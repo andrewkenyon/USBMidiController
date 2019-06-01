@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    MidiDriver myDriver;
+    MidiConnection myConnection;
+
+    Ax8Controller myController;
 
     TextView myConsole;
 
@@ -24,12 +26,13 @@ public class MainActivity extends AppCompatActivity {
 
         this.myConsole = ((TextView)this.findViewById(R.id.main_console));
 
-        this.myDriver = MidiDriver.getInstance();
-        this.myDriver.init(this);
-        this.myDriver.connect(new Runnable() {
+        this.myConnection = MidiDriver.getInstance();
+        this.myConnection.init(this);
+        this.myConnection.connect(new Runnable() {
             public void run() {
-                myConsole.setText(myDriver.getDeviceInfo());
+                myConsole.setText(myConnection.getDeviceInfo());
                 myConsole.append("Connected!");
+                myController = new Controller();
             }
         });
     }
