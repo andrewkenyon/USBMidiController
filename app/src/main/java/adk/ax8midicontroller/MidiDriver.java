@@ -28,8 +28,6 @@ public class MidiDriver {
     MidiInputPort myOutput;
     MidiOutputPort myInput;
 
-    byte myChannel = 0;
-
     public static final CC_BANK_MSB = 0;
     public static final CC_BANK_LSB = 32;
 
@@ -47,11 +45,6 @@ public class MidiDriver {
         this.myContext = context.getApplicationContext();
 
         this.myManager = ((MidiManager) this.myContext.getSystemService(Context.MIDI_SERVICE));
-    }
-
-    public void configSysEx(byte[] manufacturer, byte model) {     
-        this.myManufacturer = manufacturer;
-        this.myModel = model;
     }
 
     public void connect(final Runnable runnable) {
@@ -103,18 +96,18 @@ public class MidiDriver {
         }
     }
 
-    public boolean sendProgramChange(byte program) {
+    public boolean sendProgramChange(byte channel, byte program) {
         try {
-            this.myOutput.send(new byte[]{(byte) (0xC0 + this.myChannel), program}, 0, 2);
+            this.myOutput.send(new byte[]{(byte) (0xC0 + channel), program}, 0, 2);
             return true;
         } catch (IOException e) {
             return false;
         }
     }
 
-    public boolean sendControlChange(byte control, byte value) {
+    public boolean sendControlChange(byte channel, byte control, byte value) {
         try {
-            this.myOutput.send(new byte[]{(byte) (0xB0 + this.myChannel), control, value}, 0, 3);
+            this.myOutput.send(new byte[]{(byte) (0xB0 + channel), control, value}, 0, 3);
             return true;
         } catch (IOException e) {
             return false;
@@ -143,11 +136,11 @@ public class MidiDriver {
         }
     }
 
-   public boolean sendBankChangeMsb(byte bank) {
-         return sendControlChange(CC_BANK_MSB, bank);
+   public boolean sendBankChangeMsb(byte channel, byte bank) {
+         return sendControlChange(channel, CC_BANK_MSB, bank);
     }
 
-    public boolean sendBankChangeLsb(byte bank) {
-         return sendControlChange(CC_BANK_LSB, bank);
+    public boolean sendBankChangeLsb(byte channel, byte bank) {
+         return sendControlChange(channel, CC_BANK_LSB, bank);
     }
 }
