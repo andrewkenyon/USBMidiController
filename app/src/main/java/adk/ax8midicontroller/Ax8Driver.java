@@ -1,15 +1,18 @@
-class Ax8Driver {
-    private ourInstance = new Ax8Driver ();
+package adk.ax8midicontroller;
 
-    private ourMidiDriver;
+/**
+ * Created by Andrew on 01/07/2019.
+ */
+public class Ax8Driver {
+    Context ourContext;
 
-    private Ax8Driver () {
+    MidiDriver myMidi;
+
+    public Ax8Driver() {
+        this.myMidi = MidiDriver.getInstance();
     }
 
-    public Ax8Driver getInstance() {
-        return ourInstance;
-    }
-
-    public void init(Context context) {
+    public boolean sendBankAndProgramChange(short preset) {
+        return this.myMidi.sendBankChangeMsb(preset / 128) && sendProgramChange(preset % 128);
     }
 }
