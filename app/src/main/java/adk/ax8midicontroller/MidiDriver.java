@@ -113,7 +113,15 @@ public class MidiDriver {
         }
     }
 
+    public boolean sendBankChangeMsb(byte bank) {
+         return sendControlChange(CC_BANK_MSB, bank);
+    }
+
+    public boolean sendBankChangeLsb(byte bank) {
+         return sendControlChange(CC_BANK_LSB, bank);
+    }
+
     public boolean sendBankAndProgramChange(short preset) {
-        return sendControlChange(CC_BANK_MSB, preset / 128) && sendProgramChange(preset % 128);
+        return sendBankChangeMsb(preset / 128) && sendProgramChange(preset % 128);
     }
 }
