@@ -17,8 +17,8 @@ import javax.security.auth.callback.Callback;
 /**
  * Created by Andrew on 27/02/2016.
  */
-public class MidiDriver {
-    private static MidiDriver ourInstance = new MidiDriver();
+public class MidiConnection {
+    private static MidiConnection ourInstance = new MidiConnection();
 
     Context myContext;
 
@@ -31,14 +31,11 @@ public class MidiDriver {
     public static final CC_BANK_MSB = 0;
     public static final CC_BANK_LSB = 32;
 
-    byte[] myManufacturer;
-    byte myModel;
-
-    public static MidiDriver getInstance() {
+    public static MidiConnection getInstance() {
         return ourInstance;
     }
 
-    private MidiDriver() {
+    private MidiConnection() {
     }
 
     public void init(Context context) {
@@ -114,18 +111,15 @@ public class MidiDriver {
         }
     }
 
-    public boolean sendSysExMessage(byte[] data) {
-        if (this.myManufacturer == null || this.myModel == null) {
-            return false;
-        }
-        byte[] msg = new byte[data.length + this.myManufacturer.length +3]
+    public boolean sendSysExMessage(byte[] manufacturer, byte model, byte[] data) {
+        byte[] msg = new byte[data.length + manufacturer.length +3]
         msg[0] = 0xF0;
-        for (int i = 0; i < this.myManufacturer.length; i++) {
-            msg[i + 1] =  this.myManufacturer[i];
+        for (int i = 0; i < manufacturer.length; i++) {
+            msg[i + 1] = manufacturer[i];
         }
-        msg[this.myManufacturer.length + 1] = this.myModel;
+        msg[manufacturer.length + 1] = model;
         for (int i = 0; i < data.length; i++) {
-            msg[i + this.myManufacturer.length + 2] = data[i];
+            msg[i + manufacturer.length + 2] = data[i];
         }
         msg[msg.length - 1] = 0xF7;
         try {
