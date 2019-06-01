@@ -113,7 +113,22 @@ public class MidiDriver {
         }
     }
 
-    public boolean sendBankChangeMsb(byte bank) {
+    public boolean sendSysEx(byte[] data) {
+        byte[] msg = new byte[data.length + 2]
+        msg[0] = 0xF0;
+        for (int i = 0; i < data.length; i++) {
+            msg[i + 1] = data[i];
+        }
+        msg[msg.length - 1] = 0xF7;
+        try {
+            this.myOutput.send(msg, 0, msg.length);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+   public boolean sendBankChangeMsb(byte bank) {
          return sendControlChange(CC_BANK_MSB, bank);
     }
 
