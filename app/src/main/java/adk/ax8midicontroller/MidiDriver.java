@@ -150,8 +150,4 @@ public class MidiDriver {
     public boolean sendBankChangeLsb(byte bank) {
          return sendControlChange(CC_BANK_LSB, bank);
     }
-
-    public boolean sendBankAndProgramChange(short preset) {
-        return sendBankChangeMsb(preset / 128) && sendProgramChange(preset % 128);
-    }
 }
