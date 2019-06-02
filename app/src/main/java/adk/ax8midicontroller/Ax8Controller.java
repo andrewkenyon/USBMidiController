@@ -43,4 +43,13 @@ public class Ax8Controller {
             this.appendChecksum(body)
         );
     }
+
+    public boolean setPresetNumber(short preset) {
+        byte[] body = {0x3C, preset / 128, preset % 128};
+        return this.myConnection.sendSysExMessage(
+            MANUFACTURER_ID,
+            MODEL_ID,
+            this.appendChecksum(body)
+        );
+    }
 }
