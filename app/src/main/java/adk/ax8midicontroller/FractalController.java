@@ -3,8 +3,8 @@ package adk.ax8midicontroller;
 /**
  * Created by Andrew on 01/07/2019.
  */
-public class Ax8Controller {
-    MidiConnection myConnection;
+public class FractalController {
+    MidiDriver myDriver;
 
     byte myChannel = 0;
 
@@ -16,12 +16,12 @@ public class Ax8Controller {
     private static final byte GET_PRESET_NUMBER = 0x14;
 
     public Ax8Controller() {
-        this.myConnection = MidiConnection.getInstance();
+        this.myDriver = MidiDriver.getInstance();
     }
 
     public boolean sendBankAndProgramChange(short preset) {
-        return this.myConnection.sendBankChangeMsb(this.myChannel, preset / 128) 
-            && this.myConnection.sendProgramChange(this.myChannel, preset % 128);
+        return this.myDriver.sendBankChangeMsb(this.myChannel, preset / 128) 
+            && this.myDriver.sendProgramChange(this.myChannel, preset % 128);
     }
 
     private byte appendChecksum(byte[] body) {
@@ -37,7 +37,7 @@ public class Ax8Controller {
 
     public boolean getPresetNumber() {
         byte[] body = {0x14};
-        return this.myConnection.sendSysExMessage(
+        return this.myDriver.sendSysExMessage(
             MANUFACTURER_ID,
             MODEL_ID,
             this.appendChecksum(body)
@@ -46,7 +46,7 @@ public class Ax8Controller {
 
     public boolean setPresetNumber(short preset) {
         byte[] body = {0x3C, preset / 128, preset % 128};
-        return this.myConnection.sendSysExMessage(
+        return this.myDriver.sendSysExMessage(
             MANUFACTURER_ID,
             MODEL_ID,
             this.appendChecksum(body)
