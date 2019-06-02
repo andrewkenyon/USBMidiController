@@ -69,8 +69,16 @@ public class MidiConnection {
         myManager.openDevice(device, new MidiManager.OnDeviceOpenedListener() {
             public void onDeviceOpened(MidiDevice device) {
                 myDevice = device;
+
                 myOutput = device.openInputPort(0);
+                myOutput.connect(new MidiReceiver {
+                    public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
+                        // parse MIDI or whatever
+                    }
+                });
+
                 myInput = device.openOutputPort(0);
+
                 handler.post(runnable);
             }
         }, handler);
