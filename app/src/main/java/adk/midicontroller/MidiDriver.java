@@ -1,4 +1,4 @@
-package adk.ax8midicontroller;
+package adk.midicontroller;
 
 import android.content.Context;
 import android.media.midi.MidiDevice;
