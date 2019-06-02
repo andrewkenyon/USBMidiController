@@ -1,4 +1,4 @@
-package adk.ax8midicontroller;
+package adk.midicontroller;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
