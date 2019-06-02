@@ -17,13 +17,13 @@ import javax.security.auth.callback.Callback;
 /**
  * Created by Andrew on 27/02/2016.
  */
-public class MidiConnection {
-    private static MidiConnection ourInstance = new MidiConnection();
+public class MidiDriver {
+    private static MidiDriver ourInstance = new MidiDriver();
 
     Context myContext;
 
     MidiManager myManager;
-    Boolean isConnected = false;
+
     MidiDevice myDevice;
     MidiInputPort myOutput;
     MidiOutputPort myInput;
@@ -31,11 +31,11 @@ public class MidiConnection {
     public static final CC_BANK_MSB = 0;
     public static final CC_BANK_LSB = 32;
 
-    public static MidiConnection getInstance() {
+    public static MidiDriver getInstance() {
         return ourInstance;
     }
 
-    private MidiConnection() {
+    private MidiDriver() {
     }
 
     public void init(Context context) {
@@ -71,13 +71,13 @@ public class MidiConnection {
                 myDevice = device;
 
                 myOutput = device.openInputPort(0);
-                myOutput.connect(new MidiReceiver {
+
+                myInput = device.openOutputPort(0);
+                myInput.connect(new MidiReceiver {
                     public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
                         // parse MIDI or whatever
                     }
                 });
-
-                myInput = device.openOutputPort(0);
 
                 handler.post(runnable);
             }
