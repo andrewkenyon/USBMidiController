@@ -1,4 +1,4 @@
-package adk.ax8midicontroller;
+package adk.midicontroller;
 
 import android.content.Context;
 import android.media.midi.MidiDevice;
@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    MidiConnection myConnection;
+    MidiDriver myDriver;
 
-    Ax8Controller myController;
+    FractalController myController;
 
     TextView myConsole;
 
@@ -26,11 +26,11 @@ public class MainActivity extends AppCompatActivity {
 
         this.myConsole = ((TextView)this.findViewById(R.id.main_console));
 
-        this.myConnection = MidiDriver.getInstance();
-        this.myConnection.init(this);
-        this.myConnection.connect(new Runnable() {
+        this.myDriver = MidiDriver.getInstance();
+        this.myDriver.init(this);
+        this.myDriver.connect(new Runnable() {
             public void run() {
-                myConsole.setText(myConnection.getDeviceInfo());
+                myConsole.setText(myDriver.getDeviceInfo());
                 myConsole.append("Connected!");
                 myController = new Controller();
             }
