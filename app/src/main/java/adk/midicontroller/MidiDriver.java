@@ -25,13 +25,6 @@ public class MidiDriver {
     MidiManager myManager;
     FractalController myController;
 
-    MidiDevice myDevice;
-    MidiInputPort myOutput;
-    MidiOutputPort myInput;
-
-    public static final CC_BANK_MSB = 0;
-    public static final CC_BANK_LSB = 32;
-
     public static MidiDriver getInstance() {
         return ourInstance;
     }
