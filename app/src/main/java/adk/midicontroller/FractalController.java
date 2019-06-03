@@ -15,17 +15,8 @@ public class FractalController {
 
     private static final byte GET_PRESET_NUMBER = 0x14;
 
-    public Ax8Controller(MidiDevice device) {
-        this.myMidi = new MidiController();
-
-        myOutput = device.openInputPort(0);
-
-        myInput = device.openOutputPort(0);
-        myInput.connect(new MidiReceiver {
-            public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
-                // parse MIDI or whatever
-            }
-        });
+    public FractalController(MidiController midi) {
+        this.myMidi = midi;
     }
 
     public boolean sendBankAndProgramChange(short preset) {
