@@ -1,15 +1,31 @@
-package adk.ax8midicontroller;
+package adk.midicontroller;
+
+import android.media.midi.MidiDevice;
+import android.media.midi.MidiInputPort;
+import android.media.midi.MidiOutputPort;
+
+import java.io.IOException;
+
+import javax.security.auth.callback.Callback;
 
 /**
- * Created by Andrew on 01/07/2019.
+ * Created by Andrew on 03/07/2019.
  */
 public class MidiController {
+
+    private MidiDevice myDevice;
+    private MidiOuputPort myInput;
+    private MidiInputPort myOutput;
+
+    final static byte CC_BANK_MSB = 0;
+    final static byte CC_BANK_LSB = 32;
+
     public MidiController(MidiDevice device) {
+        this.myDevice = device;
+        this.myOutput = device.openInputPort(0);
 
-        myOutput = device.openInputPort(0);
-
-        myInput = device.openOutputPort(0);
-        myInput.connect(new MidiReceiver {
+        thus.myInput = device.openOutputPort(0);
+        this.myInput.connect(new MidiReceiver {
             public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
                 // parse MIDI or whatever
             }
