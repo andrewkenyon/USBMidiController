@@ -23,6 +23,7 @@ public class MidiDriver {
     Context myContext;
 
     MidiManager myManager;
+    FractalController myController;
 
     MidiDevice myDevice;
     MidiInputPort myOutput;
@@ -68,16 +69,7 @@ public class MidiDriver {
     private void connectToDevice(MidiDeviceInfo device, final Runnable runnable, final Handler handler) {
         myManager.openDevice(device, new MidiManager.OnDeviceOpenedListener() {
             public void onDeviceOpened(MidiDevice device) {
-                myDevice = device;
-
-                myOutput = device.openInputPort(0);
-
-                myInput = device.openOutputPort(0);
-                myInput.connect(new MidiReceiver {
-                    public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
-                        // parse MIDI or whatever
-                    }
-                });
+                myController = new FractalController(device);
 
                 handler.post(runnable);
             }
