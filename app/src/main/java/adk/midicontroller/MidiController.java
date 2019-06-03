@@ -17,6 +17,8 @@ public class MidiController {
     private MidiOuputPort myInput;
     private MidiInputPort myOutput;
 
+    private byte myChannel = 0;
+
     final static byte CC_BANK_MSB = 0;
     final static byte CC_BANK_LSB = 32;
 
@@ -24,10 +26,10 @@ public class MidiController {
         this.myDevice = device;
         this.myOutput = device.openInputPort(0);
 
-        thus.myInput = device.openOutputPort(0);
+        this.myInput = device.openOutputPort(0);
         this.myInput.connect(new MidiReceiver {
             public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
-                // parse MIDI or whatever
+                handleMidi(data);
             }
         });
     }
@@ -71,9 +73,22 @@ public class MidiController {
     }
 
     public boolean sendBankChangeMsb(byte channel, byte bank) {
-         return sendControlChange(channel, CC_BANK_MSB, bank);
+        return sendControlChange(channel, CC_BANK_MSB, bank);
     }
 
     public boolean sendBankChangeLsb(byte channel, byte bank) {
-         return sendControlChange(channel, CC_BANK_LSB, bank);
+        return sendControlChange(channel, CC_BANK_LSB, bank);
     }
+    
+    private void handleMidi(byte[] data) throws IOException {
+        if (data[0] == 0xF0) {
+            // Handle SysEx
+        } else if (this.myChannel == data[0] & 0x0F) {
+            // handle other commands
+            switch (data[0] >>> 4) {
+                default: 
+                    break;
+            }
+        }
+    }
+}
