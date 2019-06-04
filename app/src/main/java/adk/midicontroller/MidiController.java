@@ -17,6 +17,8 @@ public class MidiController {
     private MidiOuputPort myInput;
     private MidiInputPort myOutput;
 
+    private MidiListener myListener;
+
     private byte myChannel = 0;
 
     final static byte CC_BANK_MSB = 0;
@@ -27,11 +29,7 @@ public class MidiController {
         this.myOutput = device.openInputPort(0);
 
         this.myInput = device.openOutputPort(0);
-        this.myInput.connect(new MidiReceiver {
-            public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
-                handleMidi(data);
-            }
-        });
+        this.myInput.connect(new CustomReciever);
     }
 
 
@@ -80,15 +78,32 @@ public class MidiController {
         return sendControlChange(channel, CC_BANK_LSB, bank);
     }
     
-    private void handleMidi(byte[] data) throws IOException {
-        if (data[0] == 0xF0) {
-            // Handle SysEx
-        } else if (this.myChannel == data[0] & 0x0F) {
-            // handle other commands
-            switch (data[0] >>> 4) {
-                default: 
-                    break;
+    private class CustomReceiver extends MidiReceiver {
+        public void onSend(byte[] data, int offset, int count, long timestamp) throws IOException {
+            if (data[0] == 0xF0) {
+                // Handle SysEx
+            } else if (this.myChannel == data[0] & 0x0F) {
+                // handle other commands
+                switch (data[0] >>> 4) {
+                    default: 
+                        break;
+                }
             }
         }
     }
+
+    public class MidiListener {
+        protected void onSysEx(byte[] body) {
+             // Default empty handler
+        }
+
+        protected void onProgramChange(byte program) {
+              // Default empty handler
+        }
+        
+        protected void onControlChange(byte program) {
+              // Default empty handler
+        }
+    }
 }
+
